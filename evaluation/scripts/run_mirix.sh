@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Common parameters for all scripts
-LIB="memobase"
-VERSION="0722021"
-WORKERS=3
+LIB="mirix"
+VERSION="072202"
+WORKERS=10
 TOPK=20
 
 if [ "$LIB" = "mirix" ]; then
@@ -16,7 +16,7 @@ if [ "$LIB" = "mirix" ]; then
             exit 1
         fi
     done
-elif [ "$LIB" = "zep" ]; then
+elif ["$LIB" = "zep"]; then
     CUDA_VISIBLE_DEVICES=0 python scripts/personamem/pm_ingestion_zep.py --version $VERSION --workers $WORKERS
     CUDA_VISIBLE_DEVICES=0 python scripts/personamem/pm_search_zep.py --version $VERSION --top_k $TOPK --workers $WORKERS
     echo "Running pm_responses.py..."

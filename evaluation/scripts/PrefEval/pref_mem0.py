@@ -50,6 +50,7 @@ def add_memory_for_line(
                 chunk = conversation[chunk_start : chunk_start + turns_add * 2]
                 timestamp_add = int(time.time()*100)
                 mem_client.add(messages=chunk, user_id=user_id, timestamp=timestamp_add)
+                print(f"Added chunk {chunk_start // (turns_add * 2) + 1} for user_id {user_id}")
         end_time_add = time.monotonic()
         add_duration = end_time_add - start_time_add
 

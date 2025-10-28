@@ -38,11 +38,11 @@ def ingest_session(session, user_id, session_id, frame, client):
                 messages.append(
                     {
                         "role": msg["role"],
-                        "content": msg["content"][:8000],
+                        "content": msg["content"],
                         "created_at": datetime.now().isoformat(),
                     }
                 )
-            client.add(messages, user_id)
+        client.add(messages, user_id)
         print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(messages)} messages")
     elif frame == "supermemory":
         for _idx, msg in enumerate(session):
@@ -58,7 +58,8 @@ def ingest_session(session, user_id, session_id, frame, client):
         for _idx, msg in enumerate(session):
             messages.append({"role": msg["role"], "content": msg["content"]})
         client.add(messages, user_id, datetime.now().astimezone().isoformat())
-
+    elif frame == "memos-api-online":
+        client.add(messages,user_id,session_id,batch_size=10)
 
 def build_jsonl_index(jsonl_path):
     """
@@ -153,16 +154,22 @@ def ingest_conv(row_data, context, version, conv_idx, frame):
 
         client = MemosApiClient()
     elif frame == "memobase":
+        # from utils.client import MemobaseClient
+
+        # client = MemobaseClient()
+        # print("🔌 Using Memobase client for ingestion...")
+        # all_users = client.client.get_all_users(limit=5000)
+        # for user in all_users:
+        #     print(user)
+        #     # break
+        #     if user["additional_fields"] is not None:
+        #         if user["additional_fields"]["name"] == user_id:
+        #             client.client.delete_user(user["id"])
+        # user_id = client.client.add_user({"user_id": user_id})
         from utils.client import MemobaseClient
 
         client = MemobaseClient()
-        print("🔌 Using Memobase client for ingestion...")
-        all_users = client.client.get_all_users(limit=5000)
-        for user in all_users:
-            if user["additional_fields"] is not None:
-                if user["additional_fields"]["user_id"] == user_id:
-                    client.client.delete_user(user["id"])
-        user_id = client.client.add_user({"user_id": user_id})
+        client.delete_user(user_id)
     elif frame == "supermemory":
         from utils.client import SupermemoryClient
 
@@ -171,7 +178,10 @@ def ingest_conv(row_data, context, version, conv_idx, frame):
         from utils.client import MemuClient
 
         client = MemuClient()
+    elif frame == "memos-api-online":
+        from utils.client import MemosApiOnlineClient
 
+        client = MemosApiOnlineClient()
     ingest_session(session=context, user_id=user_id, session_id=conv_idx, frame=frame, client=client)
     print(f"✅ Ingestion of conversation {conv_idx} completed")
     print("=" * 80)
@@ -220,7 +230,7 @@ def main(frame, version, num_workers=2):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="PersonaMem Ingestion Script")
-    parser.add_argument("--lib", type=str, choices=["mem0", "mem0_graph", "memos-api", "memobase", "memu", "supermemory","zep"],
+    parser.add_argument("--lib", type=str, choices=["memos-api-online","mem0", "mem0_graph", "memos-api", "memobase", "memu", "supermemory","zep"],
                         default='memos-api')
     parser.add_argument("--version", type=str, default="0925-1", help="Version of the evaluation framework.")
     parser.add_argument("--workers", type=int, default=3, help="Number of parallel workers for processing users.")

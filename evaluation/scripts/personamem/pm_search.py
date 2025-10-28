@@ -92,7 +92,12 @@ def memu_search(client, query, user_id, top_k):
     context = "\n".join(results)
     duration_ms = (time() - start) * 1000
     return context, duration_ms
-
+def memos_api_online_search(client,query,user_id,top_k):
+    start = time()
+    results = client.search(query, user_id, top_k)
+    context = "\n".join(item['memory'] for cube in results['text_mem'] for item in cube['memories'])
+    duration_ms = (time() - start) * 1000
+    return context, duration_ms
 
 def build_jsonl_index(jsonl_path):
     """
@@ -213,6 +218,17 @@ def process_user(row_data, conv_idx, frame, version, top_k=20):
         client = MemuClient()
         print("🔌 Using memu client for search...")
         context, duration_ms = memu_search(client, question, user_id, top_k)
+    elif frame == "memobase":
+        from utils.client import MemobaseClient
+
+        client = MemobaseClient()
+        print("🔌 Using Memobase client for search...")
+        context, duration_ms = memobase_search(client, question, user_id, top_k)
+    elif frame == "memos-api-online":
+        from utils.client import MemosApiOnlineClient
+        client = MemosApiOnlineClient()
+        print("🔌 Using memos-api-online client for search...")
+        context, duration_ms = memos_api_online_search(client, question, user_id, top_k)
 
     search_results[user_id].append(
         {
@@ -319,7 +335,7 @@ def main(frame, version, top_k=20, num_workers=2):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="PersonaMem Search Script")
-    parser.add_argument("--lib", type=str, choices=["mem0", "mem0_graph", "memos-api", "memobase", "memu", "supermemory"],
+    parser.add_argument("--lib", type=str, choices=["memos-api-online","mem0", "mem0_graph", "memos-api", "memobase", "memu", "supermemory"],
                         default='memos-api')
     parser.add_argument("--version", type=str, default="0925", help="Version of the evaluation framework.")
     parser.add_argument("--top_k", type=int, default=20, help="Number of top results to retrieve from the search.")

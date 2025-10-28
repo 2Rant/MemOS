@@ -2,9 +2,9 @@
 
 # Common parameters for all scripts
 LIB="memobase"
-VERSION="0722021"
-WORKERS=3
-TOPK=20
+VERSION="072202"
+WORKERS=10
+TOPK=5
 
 if [ "$LIB" = "mirix" ]; then
     echo "Running pm_mirix.py 100 times..."

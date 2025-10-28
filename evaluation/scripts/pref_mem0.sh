@@ -10,9 +10,9 @@ WORKERS=10
 
 # Parameters for pref_memos.py
 TOP_K=10
-ADD_TURN=10  # Options: 0, 10, or 300
-LIB="memu"  # Options: memos-api, memos-api-online, mem0, mem0-graph, memobase, supermemory, memu, zep
-VERSION="1024-5"
+ADD_TURN=300  # Options: 0, 10, or 300
+LIB="mem0"  
+VERSION="1028-0"
 
 # --- File Paths ---
 # You may need to adjust these paths based on your project structure.
@@ -35,8 +35,6 @@ elif [[ "$LIB" == *"memu"* ]]; then
     SCRIPT_NAME_BASE="memu"
 elif [[ "$LIB" == *"zep"* ]]; then
     SCRIPT_NAME_BASE="zep"
-elif [[ "$LIB" == *"mirix"* ]]; then
-    SCRIPT_NAME_BASE="mirix"
 else
     SCRIPT_NAME_BASE=$LIB
 fi

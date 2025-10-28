@@ -53,6 +53,7 @@ First prepare the dataset `longmemeval_s` from https://huggingface.co/datasets/x
 ```
 
 ### PrefEval Evaluation
+Downloading benchmark_dataset/filtered_inter_turns.json from https://github.com/amazon-science/PrefEval/blob/main/benchmark_dataset/filtered_inter_turns.json and save it as `./data/prefeval/filtered_inter_turns.json`
 To evaluate the **Prefeval** dataset using one of the supported memory frameworks — `memos`, `mem0`, or `zep` — run the following [script](./scripts/run_prefeval_eval.sh):
 
 ```bash

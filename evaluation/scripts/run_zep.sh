@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Common parameters for all scripts
-LIB="memobase"
-VERSION="0722021"
-WORKERS=3
+LIB="zep"
+VERSION="072202"
+WORKERS=1
 TOPK=20
 
 if [ "$LIB" = "mirix" ]; then
