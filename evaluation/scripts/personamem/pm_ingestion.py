@@ -1,15 +1,18 @@
 import argparse
-import os
-import sys
 import csv
 import json
+import os
+import sys
+import time
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
+
 from tqdm import tqdm
-from zep_cloud.types import Message
-import time
+
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 def ingest_session(session, user_id, session_id, frame, client):
     messages = []
@@ -19,22 +22,23 @@ def ingest_session(session, user_id, session_id, frame, client):
         for idx, msg in enumerate(session):
             messages.append({"role": msg["role"], "content": msg["content"][:8000]})
             print(
-                f"[{frame}] 📝 Session [{session_id}: [{idx + 1}/{len(session)}] Ingesting message: {msg['role']} - {msg['content'][:50]}...")
-        timestamp_add = int(time.time()*100)
+                f"[{frame}] 📝 Session [{session_id}: [{idx + 1}/{len(session)}] Ingesting message: {msg['role']} - {msg['content'][:50]}..."
+            )
+        timestamp_add = int(time.time() * 100)
         client.add(messages=messages, user_id=user_id, timestamp=timestamp_add)
         print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(messages)} messages")
     elif frame == "memos-api":
-        if os.getenv("PRE_SPLIT_CHUNK")=="true":
+        if os.getenv("PRE_SPLIT_CHUNK") == "true":
             for i in range(0, len(session), 10):
-                messages = session[i: i + 10]
+                messages = session[i : i + 10]
                 client.add(messages=messages, user_id=user_id, conv_id=session_id)
                 print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(messages)} messages")
         else:
             client.add(messages=session, user_id=user_id, conv_id=session_id)
             print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(session)} messages")
-    elif frame =="memobase":
-        for idx, msg in enumerate(session):
-            if msg["role"]!="system":
+    elif frame == "memobase":
+        for _idx, msg in enumerate(session):
+            if msg["role"] != "system":
                 messages.append(
                     {
                         "role": msg["role"],
@@ -67,7 +71,7 @@ def build_jsonl_index(jsonl_path):
     Assumes each line is a JSON object with a single key-value pair.
     """
     index = {}
-    with open(jsonl_path, 'r', encoding='utf-8') as f:
+    with open(jsonl_path, encoding="utf-8") as f:
         while True:
             offset = f.tell()
             line = f.readline()
@@ -79,14 +83,14 @@ def build_jsonl_index(jsonl_path):
 
 
 def load_context_by_id(jsonl_path, offset):
-    with open(jsonl_path, 'r', encoding='utf-8') as f:
+    with open(jsonl_path, encoding="utf-8") as f:
         f.seek(offset)
         item = json.loads(f.readline())
         return next(iter(item.values()))
 
 
 def load_rows(csv_path):
-    with open(csv_path, mode='r', newline='', encoding='utf-8') as csvfile:
+    with open(csv_path, newline="", encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
         for _, row in enumerate(reader, start=1):
             row_data = {}
@@ -98,7 +102,7 @@ def load_rows(csv_path):
 def load_rows_with_context(csv_path, jsonl_path):
     jsonl_index = build_jsonl_index(jsonl_path)
 
-    with open(csv_path, mode='r', newline='', encoding='utf-8') as csvfile:
+    with open(csv_path, newline="", encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
         prev_sid = None
         prev_context = None
@@ -118,13 +122,13 @@ def load_rows_with_context(csv_path, jsonl_path):
 
 
 def count_csv_rows(csv_path):
-    with open(csv_path, mode='r', newline='', encoding='utf-8') as f:
+    with open(csv_path, newline="", encoding="utf-8") as f:
         return sum(1 for _ in f) - 1
 
 
 def ingest_conv(row_data, context, version, conv_idx, frame):
     end_index_in_shared_context = row_data["end_index_in_shared_context"]
-    context = context[:int(end_index_in_shared_context)]
+    context = context[: int(end_index_in_shared_context)]
     user_id = f"pm_exper_user_{conv_idx}_{version}"
     print(f"👤 User ID: {user_id}")
     print("\n" + "=" * 80)
@@ -147,7 +151,7 @@ def ingest_conv(row_data, context, version, conv_idx, frame):
         print("🔌 Using Mem0 client for ingestion...")
         client.client.delete_all(user_id=user_id)
         print(f"🗑️  Deleted existing memories for user {user_id}...")
-   
+
         print(f"🗑️  Deleted existing memories for user {user_id}...")
     elif frame == "memos-api":
         from utils.client import MemosApiClient
@@ -205,16 +209,25 @@ def main(frame, version, num_workers=2):
 
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
         future_to_idx = {
-            executor.submit(ingest_conv, row_data=row_data, context=context, version=version, conv_idx=idx,
-                            frame=frame, ): idx
-            for idx, (row_data, context) in enumerate(all_data)}
+            executor.submit(
+                ingest_conv,
+                row_data=row_data,
+                context=context,
+                version=version,
+                conv_idx=idx,
+                frame=frame,
+            ): idx
+            for idx, (row_data, context) in enumerate(all_data)
+        }
 
-        for future in tqdm(as_completed(future_to_idx), total=len(future_to_idx), desc="Processing conversations"):
+        for future in tqdm(
+            as_completed(future_to_idx), total=len(future_to_idx), desc="Processing conversations"
+        ):
             idx = future_to_idx[future]
             try:
                 future.result()
             except Exception as exc:
-                print(f'\n❌ Conversation {idx} generated an exception: {exc}')
+                print(f"\n❌ Conversation {idx} generated an exception: {exc}")
 
     end_time = datetime.now()
     elapsed_time = end_time - start_time

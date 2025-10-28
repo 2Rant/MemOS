@@ -4,12 +4,16 @@ import json
 import os
 import sys
 import time
+
+from datetime import datetime
+
 import tiktoken
+
 from dotenv import load_dotenv
+from irrelevant_conv import irre_10, irre_300
 from openai import OpenAI
 from tqdm import tqdm
-from datetime import datetime
-from irrelevant_conv import irre_10, irre_300
+
 
 ROOT_DIR = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -49,9 +53,13 @@ def add_memory_for_line(
             if os.getenv("PRE_SPLIT_CHUNK", "false").lower() == "true":
                 for chunk_start in range(0, len(conversation), turns_add * 2):
                     chunk = conversation[chunk_start : chunk_start + turns_add * 2]
-                    mem_client.add(messages=chunk, user_id=user_id, iso_date=datetime.now().isoformat())
+                    mem_client.add(
+                        messages=chunk, user_id=user_id, iso_date=datetime.now().isoformat()
+                    )
             else:
-                mem_client.add(messages=conversation, user_id=user_id, iso_date=datetime.now().isoformat())
+                mem_client.add(
+                    messages=conversation, user_id=user_id, iso_date=datetime.now().isoformat()
+                )
         end_time_add = time.monotonic()
         add_duration = end_time_add - start_time_add
 
@@ -201,7 +209,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        with open(args.input, "r", encoding="utf-8") as infile:
+        with open(args.input, encoding="utf-8") as infile:
             lines = infile.readlines()
     except FileNotFoundError:
         print(f"Error: Input file '{args.input}' not found")

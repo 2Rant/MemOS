@@ -4,12 +4,14 @@ import json
 import os
 import sys
 import time
+
 import tiktoken
+
 from dotenv import load_dotenv
+from irrelevant_conv import irre_10, irre_300
 from openai import OpenAI
 from tqdm import tqdm
-from datetime import datetime
-from irrelevant_conv import irre_10, irre_300
+
 
 ROOT_DIR = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -201,7 +203,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        with open(args.input, "r", encoding="utf-8") as infile:
+        with open(args.input, encoding="utf-8") as infile:
             lines = infile.readlines()
     except FileNotFoundError:
         print(f"Error: Input file '{args.input}' not found")
@@ -214,9 +216,7 @@ def main():
             self.client = Supermemory(api_key=os.getenv("SUPERMEMORY_API_KEY"))
 
         def add(self, messages, user_id):
-            content = "\n".join(
-                [f"{msg['role']}: {msg['content']}" for msg in messages]
-            )
+            content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
             max_retries = 5
             for attempt in range(max_retries):
                 try:
@@ -224,7 +224,7 @@ def main():
                     break
                 except Exception as e:
                     if attempt < max_retries - 1:
-                        time.sleep(2**attempt) 
+                        time.sleep(2**attempt)
                     else:
                         raise e
 
@@ -244,7 +244,7 @@ def main():
                     return context
                 except Exception as e:
                     if attempt < max_retries - 1:
-                        time.sleep(2**attempt) 
+                        time.sleep(2**attempt)
                     else:
                         raise e
 

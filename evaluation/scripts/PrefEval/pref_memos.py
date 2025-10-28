@@ -4,12 +4,14 @@ import json
 import os
 import sys
 import time
+
 import tiktoken
+
 from dotenv import load_dotenv
+from irrelevant_conv import irre_10, irre_300
 from openai import OpenAI
 from tqdm import tqdm
 
-from irrelevant_conv import irre_10, irre_300
 
 ROOT_DIR = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,6 +20,8 @@ EVAL_SCRIPTS_DIR = os.path.join(ROOT_DIR, "evaluation", "scripts")
 
 sys.path.insert(0, ROOT_DIR)
 sys.path.insert(0, EVAL_SCRIPTS_DIR)
+
+
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 BASE_URL = os.getenv("OPENAI_BASE_URL")
@@ -66,6 +70,7 @@ def search_memory_for_line(line_data: tuple, mem_client, top_k_value: int) -> di
     """
     Processes a single line of data, searching memory based on the question.
     """
+
     i, line = line_data
     try:
         original_data = json.loads(line)
@@ -86,8 +91,12 @@ def search_memory_for_line(line_data: tuple, mem_client, top_k_value: int) -> di
         start_time_search = time.monotonic()
         relevant_memories = mem_client.search(query=question, user_id=user_id, top_k=top_k_value)
         search_memories_duration = time.monotonic() - start_time_search
-        memories_str = "\n".join(
-            f"- {entry.get('memory', '')}" for entry in relevant_memories["text_mem"][0]["memories"]
+        memories_str = (
+            "\n".join(
+                f"- {entry.get('memory', '')}"
+                for entry in relevant_memories["text_mem"][0]["memories"]
+            )
+            + f"\n{relevant_memories['pref_mem']}"
         )
 
         memory_tokens_used = len(tokenizer.encode(memories_str))
@@ -109,10 +118,12 @@ def search_memory_for_line(line_data: tuple, mem_client, top_k_value: int) -> di
         return None
 
 
-def generate_response_for_line(line_data: tuple, openai_client: OpenAI) -> dict:
+def generate_response_for_line(line_data: tuple, openai_client: OpenAI, lib: str) -> dict:
     """
     Generates a response for a single line of data using pre-fetched memories.
     """
+    from utils.prompts import PREFEVAL_ANSWER_PROMPT
+
     i, line = line_data
     try:
         original_data = json.loads(line)
@@ -137,7 +148,7 @@ def generate_response_for_line(line_data: tuple, openai_client: OpenAI) -> dict:
             )
             return original_data
 
-        system_prompt = f"You are a helpful AI. Answer the question based on the query and the following memories:\nUser Memories:\n{memories_str}"
+        system_prompt = PREFEVAL_ANSWER_PROMPT.format(context=memories_str)
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": question},
@@ -199,7 +210,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        with open(args.input, "r", encoding="utf-8") as infile:
+        with open(args.input, encoding="utf-8") as infile:
             lines = infile.readlines()
     except FileNotFoundError:
         print(f"Error: Input file '{args.input}' not found")
@@ -278,7 +289,7 @@ def main():
             concurrent.futures.ThreadPoolExecutor(max_workers=args.max_workers) as executor,
         ):
             futures = [
-                executor.submit(generate_response_for_line, (i, line), openai_client)
+                executor.submit(generate_response_for_line, (i, line), openai_client, args.lib)
                 for i, line in enumerate(lines)
             ]
 
