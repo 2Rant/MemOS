@@ -2,8 +2,8 @@
 
 # Common parameters for all scripts
 LIB="memobase"
-VERSION="0722021"
-WORKERS=3
+VERSION="07220"
+WORKERS=10
 TOPK=20
 
 if [ "$LIB" = "mirix" ]; then

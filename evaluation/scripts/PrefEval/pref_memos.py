@@ -47,7 +47,7 @@ def add_memory_for_line(
         elif num_irrelevant_turns == 300:
             conversation = conversation + irre_300
 
-        turns_add = 5
+        turns_add = 1
         start_time_add = time.monotonic()
         if conversation:
             mem_client.add(messages=conversation, user_id=user_id, conv_id=None, batch_size=turns_add*2)
@@ -93,7 +93,7 @@ def search_memory_for_line(line_data: tuple, mem_client, top_k_value: int) -> di
                 f"- {entry.get('memory', '')}"
                 for entry in relevant_memories["text_mem"][0]["memories"]
             )
-            + f"\n{relevant_memories['pref_mem']}"
+            # + f"\n{relevant_memories['pref_mem']}"
         )
 
         memory_tokens_used = len(tokenizer.encode(memories_str))

@@ -22,7 +22,7 @@ evaluation/configs/*
 # 忽略 evaluation/data 文件夹下的所有内容
 # ----------------------------------------------------
 evaluation/data/personamem/
-evaluation/data/prefeval/
+# evaluation/data/prefeval/
 
 # ----------------------------------------------------
 # 忽略 evaluation/scripts/ 下的所有特定脚本文件

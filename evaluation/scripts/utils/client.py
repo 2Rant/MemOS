@@ -110,7 +110,7 @@ class MemobaseClient:
         for i in range(0, len(messages), batch_size):
             print(f"Adding messages {i} to {min(i + batch_size, len(messages))}...")
             batch_messages = messages[i : i + batch_size]
-            max_retries = 5
+            max_retries = 10
             for attempt in range(max_retries):
                 try:
                     _ = user.insert(ChatBlob(messages=batch_messages), sync=True)
@@ -118,7 +118,7 @@ class MemobaseClient:
                     if attempt < max_retries - 1:
                         time.sleep(2**attempt)
                     else:
-                        raise e
+                        raise f"error"
 
     def search(self, query, user_id, top_k):
         real_uid = self.string_to_uuid(user_id)

@@ -34,7 +34,7 @@ def add_memory_for_line(
     Adds conversation memory for a single line of data to MemOS and returns the data with a persistent user_id.
     """
     i, line = line_data
-    user_id = f"{lib}_user_pref_eval_{i}_{version}"
+    user_id = f"{lib}_user_pref_eval_{i+1000}_{version}"
     mem_client.delete_user(user_id)
     try:
         original_data = json.loads(line)

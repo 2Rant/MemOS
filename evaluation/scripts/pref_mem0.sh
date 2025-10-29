@@ -134,7 +134,6 @@ echo "Running pref_eval.py..."
 python scripts/PrefEval/pref_eval.py \
     --input $RESPONSE_FILE \
     --concurrency-limit $WORKERS
-    
 if [ $? -ne 0 ]; then
     echo "Error: Evaluation script failed."
     exit 1
