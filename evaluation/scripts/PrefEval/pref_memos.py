@@ -50,9 +50,6 @@ def add_memory_for_line(
         turns_add = 5
         start_time_add = time.monotonic()
         if conversation:
-            # if os.getenv("PRE_SPLIT_CHUNK", "false").lower() == "true":
-            #     mem_client.add(messages=conversation, user_id=user_id, conv_id=None, batch_size=turns_add*2)
-            # else:
             mem_client.add(messages=conversation, user_id=user_id, conv_id=None, batch_size=turns_add*2)
         end_time_add = time.monotonic()
         add_duration = end_time_add - start_time_add
