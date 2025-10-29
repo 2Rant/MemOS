@@ -17,26 +17,8 @@ evaluation/configs/*
 **tree_textual_memory_locomo**
 **script.py**
 .env
-# evaluation/scripts/personamem
-# ----------------------------------------------------
-# 忽略 evaluation/data 文件夹下的所有内容
-# ----------------------------------------------------
-evaluation/data/personamem/
-evaluation/data/prefeval/
+evaluation/scripts/personamem
 
-# ----------------------------------------------------
-# 忽略 evaluation/scripts/ 下的所有特定脚本文件
-# ----------------------------------------------------
-evaluation/scripts/pm_mem0.sh
-evaluation/scripts/pm_memobase.sh
-evaluation/scripts/pm_mirix.sh
-evaluation/scripts/pm_zep.sh
-evaluation/scripts/pref_mem0.sh
-evaluation/scripts/pref_memobase.sh
-evaluation/scripts/pref_supermemory.sh
-
-# 忽略之前报错的文件 (以防万一)
-evaluation/data/personamem/questions_32k copy.csv
 # benchmarks
 benchmarks/
 
