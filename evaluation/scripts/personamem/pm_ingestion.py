@@ -25,17 +25,11 @@ def ingest_session(session, user_id, session_id, frame, client):
                 f"[{frame}] 📝 Session [{session_id}: [{idx + 1}/{len(session)}] Ingesting message: {msg['role']} - {msg['content'][:50]}..."
             )
         timestamp_add = int(time.time() * 100)
-        client.add(messages=messages, user_id=user_id, timestamp=timestamp_add)
+        client.add(messages=messages, user_id=user_id, timestamp=timestamp_add,batch_size=10)
         print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(messages)} messages")
     elif frame == "memos-api":
-        if os.getenv("PRE_SPLIT_CHUNK") == "true":
-            for i in range(0, len(session), 10):
-                messages = session[i : i + 10]
-                client.add(messages=messages, user_id=user_id, conv_id=session_id)
-                print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(messages)} messages")
-        else:
-            client.add(messages=session, user_id=user_id, conv_id=session_id)
-            print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(session)} messages")
+        client.add(messages=session, user_id=user_id, conv_id=session_id,batch_size=10)
+        print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(session)} messages")
     elif frame == "memobase":
         for _idx, msg in enumerate(session):
             if msg["role"] != "system":
@@ -46,7 +40,7 @@ def ingest_session(session, user_id, session_id, frame, client):
                         "created_at": datetime.now().isoformat(),
                     }
                 )
-        client.add(messages, user_id)
+        client.add(messages, user_id,batch_size=10)
         print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(messages)} messages")
     elif frame == "supermemory":
         for _idx, msg in enumerate(session):
