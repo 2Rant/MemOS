@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Common parameters for all scripts
-LIB="memobase"
-VERSION="07220_501"
+LIB="memos-api"  
+VERSION="default"
 WORKERS=50
 TOPK=20
 
