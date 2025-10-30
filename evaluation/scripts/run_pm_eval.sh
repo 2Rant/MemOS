@@ -2,7 +2,7 @@
 
 # Common parameters for all scripts
 LIB="memobase"
-VERSION="07220"
+VERSION="07220_300"
 WORKERS=10
 TOPK=20
 

@@ -112,11 +112,6 @@ python $LIB_SCRIPT search \
     --top-k $TOP_K \
     --max-workers $WORKERS
 
-# python scripts/PrefEval/pref_memobase.py search \
-#     --input results/prefeval/memobase_1027-2/pref_memobase_add.jsonl \
-#     --output results/prefeval/memobase_1027-2/pref_memobase_search.jsonl \
-#     --top-k 10 \
-#     --max-workers 10
 if [ $? -ne 0 ]; then
     echo "Error: $LIB_SCRIPT 'search' mode failed."
     exit 1
@@ -129,10 +124,7 @@ python $LIB_SCRIPT response \
     --input $SEARCH_FILE \
     --output $RESPONSE_FILE \
     --max-workers $WORKERS
-# python scripts/PrefEval/pref_memobase.py response \
-#     --input results/prefeval/memobase_1027-2/pref_memobase_search.jsonl \
-#     --output results/prefeval/memobase_1027-2/pref_memobase_response.jsonl \
-#     --max-workers 10
+
 if [ $? -ne 0 ]; then
     echo "Error: $LIB_SCRIPT 'response' mode failed."
     exit 1
@@ -145,10 +137,6 @@ python scripts/PrefEval/pref_eval.py \
     --input $RESPONSE_FILE \
     --concurrency-limit $WORKERS \
     --lib $LIB
-# python scripts/PrefEval/pref_eval.py \
-#     --input results/prefeval/memobase_1027-2/pref_memobase_response.jsonl \
-#     --concurrency-limit 10 \
-#     --lib memobase
 
 if [ $? -ne 0 ]; then
     echo "Error: Evaluation script failed."

@@ -40,7 +40,7 @@ def ingest_session(session, user_id, session_id, frame, client):
                         "created_at": datetime.now().isoformat(),
                     }
                 )
-        client.add(messages, user_id,batch_size=30)
+        client.add(messages, user_id,batch_size=50)
         print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(messages)} messages")
     elif frame == "supermemory":
         for _idx, msg in enumerate(session):
