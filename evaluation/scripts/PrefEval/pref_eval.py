@@ -392,9 +392,7 @@ async def main(concurrency_limit: int, input_file: str, output_file: str, output
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate assistant responses from a JSONL file.")
 
-    parser.add_argument(
-        "--input", type=str, required=True, help="Path to the input JSONL file."
-    )
+    parser.add_argument("--input", type=str, required=True, help="Path to the input JSONL file.")
 
     parser.add_argument(
         "--concurrency-limit",
@@ -406,7 +404,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "--lib",
         type=str,
-        choices=["memos-api-online","mem0", "mem0_graph", "memos-api", "memobase", "memu", "supermemory","zep"],
+        choices=[
+            "memos-api-online",
+            "mem0",
+            "mem0_graph",
+            "memos-api",
+            "memobase",
+            "memu",
+            "supermemory",
+            "zep",
+        ],
         default="memos-api",
         help="Which library to use (used in 'add' mode).",
     )

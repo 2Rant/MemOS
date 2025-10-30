@@ -2,8 +2,8 @@
 
 # Common parameters for all scripts
 LIB="memobase"
-VERSION="07220_300"
-WORKERS=10
+VERSION="07220_501"
+WORKERS=50
 TOPK=20
 
 if [ "$LIB" = "zep" ]; then

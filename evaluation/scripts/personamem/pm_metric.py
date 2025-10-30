@@ -351,9 +351,9 @@ def print_summary(results):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="PersonaMem evaluation metrics calculation script")
     parser.add_argument(
-        "--lib", 
-        type=str, 
-        choices=["memos-api-online","zep","mem0", "mem0_graph", "memos-api", "memobase", "memu", "supermemory"],
+        "--lib",
+        type=str,
+        choices=["zep", "mem0", "mem0_graph", "memos-api", "memos-api-online", "memobase", "memu", "supermemory"],
         required=True,
         help="Memory library to evaluate",
         default="memos-api",

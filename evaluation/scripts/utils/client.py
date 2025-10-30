@@ -180,6 +180,8 @@ class MemosApiClient:
                 "mem_cube_id": user_id,
                 "conversation_id": "",
                 "top_k": top_k,
+                "mode": os.getenv("SEARCH_MODE", "fast"),
+                "handle_pref_mem": False,
             },
             ensure_ascii=False,
         )
@@ -229,6 +231,7 @@ class MemosApiOnlineClient:
                 "query": query,
                 "user_id": user_id,
                 "memory_limit_number": top_k,
+                "mode": os.getenv("SEARCH_MODE", "fast"),
             }
         )
 
@@ -241,7 +244,7 @@ class MemosApiOnlineClient:
                 res = json.loads(response.text)["data"]["memory_detail_list"]
                 for i in res:
                     i.update({"memory": i.pop("memory_value")})
-                return {"text_mem": [{"memories": res}]}
+                return {"text_mem": [{"memories": res}], "pref_str": ""}
             except Exception as e:
                 if attempt < max_retries - 1:
                     time.sleep(2**attempt)
@@ -311,7 +314,7 @@ class MemuClient:
                 agent_name=self.agent_id,
                 session_date=iso_date,
             )
-            self.wait_for_completion(response.task_id)
+            self.wait_for_completion(response.item_id)
         except Exception as error:
             print("❌ Error saving conversation:", error)
 

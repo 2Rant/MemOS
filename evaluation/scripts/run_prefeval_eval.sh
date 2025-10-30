@@ -6,7 +6,7 @@
 # Number of workers for parallel processing.
 # This variable controls both pref_memos.py (--max-workers)
 # and pref_eval.py (--concurrency-limit).
-WORKERS=20
+WORKERS=40
 
 # Parameters for pref_memos.py
 TOP_K=10
@@ -17,7 +17,7 @@ VERSION="1029-300"
 # --- File Paths ---
 # You may need to adjust these paths based on your project structure.
 # Step 1 (preprocess) outputs this file:
-PREPROCESSED_FILE="data/prefeval/pref_processed.jsonl"
+PREPROCESSED_FILE="results/prefeval/memobase_1027-2/unprocessed_1030.jsonl"
 
 # Create a directory name based on the *specific* LIB (e.g., "memos")
 OUTPUT_DIR="results/prefeval/${LIB}_${VERSION}"

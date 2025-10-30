@@ -44,6 +44,8 @@ class SimpleTreeTextMemory(TreeTextMemory):
         """Initialize memory with the given configuration."""
         time_start = time.time()
         self.config: TreeTextMemoryConfig = config
+        self.mode = self.config.mode
+        logger.info(f"Tree mode is {self.mode}")
 
         self.extractor_llm: OpenAILLM | OllamaLLM | AzureLLM = llm
         logger.info(f"time init: extractor_llm time is: {time.time() - time_start}")
@@ -79,20 +81,6 @@ class SimpleTreeTextMemory(TreeTextMemory):
             logger.info("No internet retriever configured")
         logger.info(f"time init: internet_retriever time is: {time.time() - time_start_ir}")
 
-    def add(
-        self, memories: list[TextualMemoryItem | dict[str, Any]], user_name: str | None = None
-    ) -> list[str]:
-        """Add memories.
-        Args:
-            memories: List of TextualMemoryItem objects or dictionaries to add.
-        Later:
-            memory_items = [TextualMemoryItem(**m) if isinstance(m, dict) else m for m in memories]
-            metadata = extract_metadata(memory_items, self.extractor_llm)
-            plan = plan_memory_operations(memory_items, metadata, self.graph_store)
-            execute_plan(memory_items, metadata, plan, self.graph_store)
-        """
-        return self.memory_manager.add(memories, user_name=user_name)
-
     def replace_working_memory(
         self, memories: list[TextualMemoryItem], user_name: str | None = None
     ) -> None:
@@ -115,6 +103,34 @@ class SimpleTreeTextMemory(TreeTextMemory):
         This delegates to the MemoryManager.
         """
         return self.memory_manager.get_current_memory_size(user_name=user_name)
+
+    def get_searcher(
+        self,
+        manual_close_internet: bool = False,
+        moscube: bool = False,
+    ):
+        if (self.internet_retriever is not None) and manual_close_internet:
+            logger.warning(
+                "Internet retriever is init by config , but  this search set manual_close_internet is True  and will close it"
+            )
+            searcher = Searcher(
+                self.dispatcher_llm,
+                self.graph_store,
+                self.embedder,
+                self.reranker,
+                internet_retriever=None,
+                moscube=moscube,
+            )
+        else:
+            searcher = Searcher(
+                self.dispatcher_llm,
+                self.graph_store,
+                self.embedder,
+                self.reranker,
+                internet_retriever=self.internet_retriever,
+                moscube=moscube,
+            )
+        return searcher
 
     def search(
         self,
@@ -269,17 +285,6 @@ class SimpleTreeTextMemory(TreeTextMemory):
         )
 
     def get_by_ids(self, memory_ids: list[str]) -> list[TextualMemoryItem]:
-        raise NotImplementedError
-
-    def get_all(self) -> dict:
-        """Get all memories.
-        Returns:
-            list[TextualMemoryItem]: List of all memories.
-        """
-        all_items = self.graph_store.export_graph()
-        return all_items
-
-    def delete(self, memory_ids: list[str]) -> None:
         raise NotImplementedError
 
     def delete_all(self) -> None:
