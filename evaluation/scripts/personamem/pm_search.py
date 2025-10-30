@@ -285,7 +285,7 @@ def main(frame, version, top_k=20, num_workers=2):
     print(f"🔍 PERSONAMEM SEARCH - {frame.upper()} v{version}".center(80))
     print("=" * 80)
 
-    question_csv_path = "data/personamem/questions_32k copy.csv"
+    question_csv_path = "data/personamem/questions_32k.csv"
     context_jsonl_path = "data/personamem/shared_contexts_32k.jsonl"
     total_rows = count_csv_rows(question_csv_path)
 

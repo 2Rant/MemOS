@@ -40,7 +40,7 @@ def ingest_session(session, user_id, session_id, frame, client):
                         "created_at": datetime.now().isoformat(),
                     }
                 )
-        client.add(messages, user_id,batch_size=50)
+        client.add(messages, user_id,batch_size=10)
         print(f"[{frame}] ✅ Session [{session_id}]: Ingested {len(messages)} messages")
     elif frame == "supermemory":
         for _idx, msg in enumerate(session):
@@ -178,7 +178,7 @@ def main(frame, version, num_workers=2):
     print(f"🚀 PERSONAMEM INGESTION - {frame.upper()} v{version}".center(80))
     print("=" * 80)
 
-    question_csv_path = "data/personamem/questions_32k copy.csv"
+    question_csv_path = "data/personamem/questions_32k.csv"
     context_jsonl_path = "data/personamem/shared_contexts_32k.jsonl"
     total_rows = count_csv_rows(question_csv_path)
 
