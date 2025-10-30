@@ -35,8 +35,6 @@ elif [[ "$LIB" == *"memu"* ]]; then
     SCRIPT_NAME_BASE="memu"
 elif [[ "$LIB" == *"zep"* ]]; then
     SCRIPT_NAME_BASE="zep"
-elif [[ "$LIB" == *"mirix"* ]]; then
-    SCRIPT_NAME_BASE="mirix"
 else
     SCRIPT_NAME_BASE=$LIB
 fi
